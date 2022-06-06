@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Home</title>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" href="ventbot.css" type="text/css">
+		<link rel="stylesheet" href="chatbot.css" type="text/css">
+		<script src="https://kit.fontawesome.com/b4b2d9549e.js" crossorigin="anonymous"></script>
+
+		
+	</head>
+	<body>
+
+		<nav class="navbar-expand navbar-light topbar mb-4 static-top shadow container-fluid">
+			<div class="row" id="logged" >
+				<div class="col-10">
+					<a class="ml-4 mr-3 mt-1 navbar-brand" href="home.html">
+						<h4>VentBot</h4>
+					</a>
+					<a class="p-2 text-right" href="text_classification.html" id="text_class">Text Classifier</a>
+					<a class="p-2 text-right" href="audio_classification.html" id="audio_class">Audio Classifier</a>
+				</div>
+			</div>
+		</nav>
+
+		
+		<div class="page-content page-container" id="page-content">
+		    <div class="padding">
+		        <div class="row container-fluid d-flex justify-content-center ml-1">
+		            <div class="col-md-6">
+		                <div class="card card-bordered">
+		                    <div class="card-header">
+		                        <h4 class="card-title"><strong>Chat</strong></h4>
+		                    </div>
+		                    <div class="ps-container ps-theme-default ps-active-y" id="chat-content" style="overflow-y: scroll !important; height:75vh !important;">
+		                        <div class="media media-chat" id="bot_intro"> <img class="avatar" src="blankprofile.png" alt="...">
+		                            <div class="media-body">
+		                                <p>Hi, welcome to VentBot</p>                       
+		                            </div>
+		                        </div>
+		                      
+
+		                        <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;">
+		                            <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+		                        </div>
+		                        <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; right: 2px;">
+		                            <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 2px;"></div>
+		                        </div>
+		                    </div>
+		                    <div class="publisher bt-1 border-light"> <img class="avatar avatar-xs" src="blankprofile.png" alt="..."> <input id="user_input" class="publisher-input" type="text" placeholder="Write something" > <input id="upload" type="file"/><a class="publisher-btn text-info" id="upload_link" href="#" data-abc="true"><i class="fa fa-microphone"></i></a><a class="publisher-btn text-info" href="#" data-abc="true" onclick="return send_chat();"><i class="fa fa-paper-plane"></i></a> </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+	</body>
+</html>
+
+<script >
+
+	$(function(){
+	    $("#upload_link").on('click', function(e){
+	        e.preventDefault();
+	        $("#upload:hidden").trigger('click');
+
+	    });
+	});
+
+	$(document).ready(function(){
+	    $("#upload").on('change',function(){
+	        const input_file = document.getElementById("upload").files[0].name;
+			console.log(input_file);
+			text = transcribe(input_file);
+			// Output text as normal
+			send_audio_chat(text);
+	    });
+	});
+
+	$("#user_input").on('keyup', function (event) {
+      if (event.keyCode === 13) {
+         send_chat();
+      }
+   });
+
+	function transcribe(input) {
+		name = input
+
+		var url = "http://localhost:8080";
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", url, false);
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+		
+		var input = {'type': 'Audio', 'input': name}
+		var data = JSON.stringify(input);
+		console.log(data)
+
+		xhr.send(data)
+
+		return xhr.responseText;
+	}
+
+	function get_response(input) {
+
+
+		console.log('zzzzz')
+
+		const newOuterDiv = document.createElement("div");
+		const newInnerDiv = document.createElement("div");
+		const newImg = document.createElement("img");
+		const newP = document.createElement("p");
+
+		// Call python function to get response
+		words = input.split('@')[0]
+		emotion = input.split('@')[1]
+
+
+
+
+
+
+
+
+
+		var url = "http://localhost:8080";
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", url, false);
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+		
+		var new_input = {'type': 'Chatbot', 'input': words, 'emotion': emotion}
+		var data = JSON.stringify(new_input);
+		console.log(data)
+
+		xhr.send(data);
+
+
+
+
+
+
+
+
+
+
+		var response = xhr.responseText
+
+
+
+		
+
+		console.log(response)
+
+		const newContent = document.createTextNode(response);
+
+		newP.appendChild(newContent);
+
+		newOuterDiv.classList.add("media");
+		newOuterDiv.classList.add("media-chat");
+
+		newImg.src = "blankprofile.png";
+		newImg.alt = "..."
+		  
+		newInnerDiv.classList.add("media-body");
+
+		newImg.classList.add("avatar");
+
+		newOuterDiv.appendChild(newImg);
+		newOuterDiv.appendChild(newInnerDiv);
+
+		newInnerDiv.appendChild(newP);
+
+		const currentDiv = $("div").find(".media-chat:last")
+		//const currentDiv = document.getElementById("bot_intro");
+		  
+		insertAfter(newOuterDiv, currentDiv[0]);
+	}
+
+	function send_chat() {
+
+
+
+		// create a new div element
+	  const newOuterDiv = document.createElement("div");
+	  const newInnerDiv = document.createElement("div");
+	  const newP = document.createElement("p");
+
+	  var input = document.getElementById("user_input").value;
+	  document.getElementById("user_input").value = '';
+
+	  // and give it some content
+	  const newContent = document.createTextNode(input);
+
+	  // add the text node to the newly created div
+	  newP.appendChild(newContent);
+
+	  newOuterDiv.classList.add("media");
+	  newOuterDiv.classList.add("media-chat");
+	  newOuterDiv.classList.add("media-chat-reverse");
+	  
+	  newInnerDiv.classList.add("media-body");
+
+
+	  newOuterDiv.appendChild(newInnerDiv);
+	  newInnerDiv.appendChild(newP);
+
+	  // add the newly created element and its content into the DOM
+	  const currentDiv = $("div").find(".media-chat:last")
+	  console.log(currentDiv[0]);
+	  // const currentDiv = document.getElementById("div1");
+	  // console.log(currentDiv);
+	  
+	  insertAfter(newOuterDiv, currentDiv[0]);
+
+	  var words = input
+
+		var url = "http://localhost:8080";
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", url, false);
+
+
+
+
+		xhr.setRequestHeader("Accept", "application/json");
+		xhr.setRequestHeader("Content-Type", "application/json");
+
+		var input = {'type': 'Text', 'input': words}
+		
+		
+		var data = JSON.stringify(input);
+		console.log(data)
+
+		console.log("dfvdfvdfvdfvdfvdf")
+		xhr.send(data);////////////////////////////////////
+		
+		input = words + '@' + xhr.responseText
+		console.log(input)
+
+	  get_response(input);
+		return false;
+	}
+
+	function send_audio_chat(text) {
+		// create a new div element
+
+		words = text.split('@')[0]
+	  const newOuterDiv = document.createElement("div");
+	  const newInnerDiv = document.createElement("div");
+	  const newP = document.createElement("p");
+
+	  // and give it some content
+	  const newContent = document.createTextNode(words);
+
+	  // add the text node to the newly created div
+	  newP.appendChild(newContent);
+
+	  newOuterDiv.classList.add("media");
+	  newOuterDiv.classList.add("media-chat");
+	  newOuterDiv.classList.add("media-chat-reverse");
+	  
+	  newInnerDiv.classList.add("media-body");
+
+
+	  newOuterDiv.appendChild(newInnerDiv);
+	  newInnerDiv.appendChild(newP);
+
+	  // add the newly created element and its content into the DOM
+	  const currentDiv = $("div").find(".media-chat:last")
+	  console.log(currentDiv[0]);
+	  // const currentDiv = document.getElementById("div1");
+	  // console.log(currentDiv);
+	  
+	  insertAfter(newOuterDiv, currentDiv[0]);
+	  get_response(text);
+		return false;
+	}
+
+	function insertAfter(newNode, referenceNode) {
+	    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+	}
+
+</script>
